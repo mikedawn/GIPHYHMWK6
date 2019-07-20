@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Sportastic</title>
+
+    <style type="text/css">
+        button {
+            background-color: rgb(84, 169, 211);
+            border: none;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+
+        body {
+
+            background-color: gray;
+
+        }
+
+        div,
+        form,
+        input {
+
+            margin: 20px;
+        }
+    </style>
+
+
+
+
+</head>
+
+<body>
+    <div class="container">
+        <h1>Sportastic</h1>
+
+        <!-- Rendered Buttons will get Dumped Here  -->
+        <div id="buttons-view"></div>
+
+        <form id="sport-form">
+            <label for="sport-input">Add a Sport!</label>
+            <input type="text" id="sport-input">
+            <br>
+
+            <!-- Button triggers new sport to be added -->
+            <input id="add-sport" type="submit" value="Add your Sport!">
+        </form>
+
+        <!-- Movies will Get Dumped Here -->
+        <div id="sport-view"></div>
+
+
+        <div id="gifs-appear-here"></div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script type="text/javascript">
+
+
+            // Initial array 
+            var sports = ["basketball", "football", "soccer", "golf"];
+
+
+            function displaySportInfo() {
+
+
+                var sport = $(this).attr("data-name");
+
+                console.log(sport);
+
+                var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + sport + "&api_key=NboZIbbhYd3ktqKYAPpw3huD841MgC4E";
+
+
+                $.ajax({
+                    url: queryURL,
+                    method: "GET"
+                }).then(function (response) {
+
+                    // Creating a div to hold 
+                    var sportDiv = $("<div class='mySport'>");
+
+
+
+                    var max = 10;
+
+                    for (var i = 0; i < max; i++) {
+
+                        // Storing the rating data
+                        var rating = response.data[i].rating;
+
+                        // Creating an element to have the rating displayed
+                        var pOne = $("<p>").text("Rating: " + rating);
+
+                        // Displaying the rating
+                        sportDiv.append(pOne);
+
+                        console.log(response)
+
+                        var imageUrl = response.data[i].images.original_still.url;
+
+                        console.log(imageUrl)
+
+                        var imageTag = "<img src='" + imageUrl + "' alt=''>"
+
+                        //var imageTag = $("<image>").attr("src",imageUrl);
+
+                        // Appending the image
+                        sportDiv.append(imageTag);
+
+
+                    }
+
+
+
+
+                    // Putting the entire sport above the previous sports
+                    $("#sport-view").prepend(sportDiv);
+                });
+
+
+            }
+
+
+            // Function for displaying sport data
+            function renderButtons() {
+
+
+                // (this is necessary otherwise you will have repeat buttons)
+                $("#buttons-view").empty();
+
+                // Looping through the array of sports
+                for (var i = 0; i < sports.length; i++) {
+
+                    // Then dynamicaly generating buttons for each sport in the array
+                    // This code $("<button>") is all jQuery needs to create the beginning and end tag. (<button></button>)
+                    var a = $("<button>");
+                    // Adding a class of movie-btn to our button
+                    a.addClass("sport-btn");
+                    // Adding a data-attribute
+                    a.attr("data-name", sports[i]);
+                    // Providing the initial button text
+                    a.text(sports[i]);
+                    // Adding the button to the buttons-view div
+                    $("#buttons-view").append(a);
+                }
+            }
+
+
+
+            $("#add-sport").on("click", function (event) {
+                event.preventDefault();
+
+                var sport = $("#sport-input").val().trim();
+
+
+                sports.push(sport);
+
+
+                renderButtons();
+            });
+
+
+
+
+            $(document).on("click", ".sport-btn", displaySportInfo);
+
+
+            renderButtons();
+
+
+
+
+
+        </script>
+    </div>
+</body>
+
+</html>
